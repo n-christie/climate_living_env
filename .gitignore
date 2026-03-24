@@ -33,3 +33,6 @@ nohup.out
 
 # ── Duplicate script copies (Windows download artefacts) ─────────────────────
 scripts/
+
+# ── Grant applications and confidential documents ─────────────────────────────
+documentation/
