@@ -101,11 +101,15 @@ event flags for linkage to health outcome data.
 - **Notes**: Netatmo public API provides current readings only (no historical).
   Requires free developer account at https://dev.netatmo.com
 
-### Influenza data ⚠ missing
+### Influenza data ✓ complete
 - **What**: Weekly influenza incidence from Folkhälsomyndigheten
-- **Use**: `define_events.R` can flag influenza-season weeks if present
-- **Action**: Download from https://www.folkhalsomyndigheten.se and save as
-  `01_smhi/output/influenza_weekly.csv`
+- **Source files**: `data/binflReg_*.xlsx` (regional, 2015 w40–2026 w11),
+  `data/ainflivavLtyp_*.xlsx` (national by subtype, 2020+)
+- **Output**: `01_smhi/output/influenza_weekly.csv` (year, week, incidence_per_100k for Skåne)
+- **Notes**: Totalt influensa per 100k, Skåne region (Region Skåne). Max observed
+  incidence 30.6/100k (week 52/2022). The epidemic threshold used in `define_events.R`
+  (>50/100k) is not reached in the 2015–2026 period — no flu weeks are currently flagged.
+  Consider adjusting threshold if regional-level flagging is needed for the analysis.
 
 ## Linkage to RELOC-AGE
 
