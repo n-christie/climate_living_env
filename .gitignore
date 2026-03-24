@@ -29,3 +29,7 @@ Thumbs.db
 *.swp
 *~
 nohup.out
+*.Zone.Identifier
+
+# ── Duplicate script copies (Windows download artefacts) ─────────────────────
+scripts/
