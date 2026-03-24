@@ -56,6 +56,22 @@ The pipeline produces a daily exposure matrix covering Skåne 2010–2023, with 
 per date × insulation epoch, containing estimated indoor temperature alongside extreme
 event flags for linkage to health outcome data.
 
+## Study area
+
+![Study area map: Skåne with SMHI stations and ERA5 grid](figures/fig_01_study_area.png)
+
+*Figure 1. The 12 active SMHI temperature stations (circles, coloured by mean June–August
+daily maximum temperature 2010–2023) and the ERA5 0.25° reanalysis grid (54 cells) covering
+Skåne. Western stations (Malmö, Helsingborg) are consistently warmer in summer than inland
+and northern sites.*
+
+![Annual thermal-stress days in Skåne 2010–2023](figures/fig_02_heatwave.png)
+
+*Figure 2. Annual count of heat-stress days (Tmax ≥ 25°C and Tmean ≥ 20°C) and cold-stress
+days (Tmin ≤ −10°C), median across SMHI stations. The 2018 heatwave is the most extreme
+event in the record; 2022 shows two shorter episodes. Cold winters (2010, 2012) are the main
+cold-stress years.*
+
 ## Data sources and status
 
 ### SMHI station observations ✓ complete
