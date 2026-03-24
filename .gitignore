@@ -1,0 +1,31 @@
+# ── Data outputs (large / reproducible from scripts) ─────────────────────────
+01_smhi/output/
+02_betsi/output/
+03_fraunhofer/output/
+03_fraunhofer/OpenSmartHomeData/
+04_netatmo/output/
+05_era5/output/
+06_integrate/output/
+
+# ── Credentials ───────────────────────────────────────────────────────────────
+.ecmwfapirc
+.cdsapirc
+.Renviron
+
+# ── R artefacts ───────────────────────────────────────────────────────────────
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# ── Python artefacts ──────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*~
+nohup.out
