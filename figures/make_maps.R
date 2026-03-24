@@ -98,12 +98,10 @@ label_nudge <- tribble(
   "Falsterbo",          -0.23,   -0.07,
   "Malmö",              -0.20,   -0.07,
   "Sturup",              0.03,   -0.09,
-  "Lund",               -0.19,    0.05,
   "Hörby A",             0.14,    0.03,
   "Skillinge",          -0.22,   -0.07,
   "Helsingborg",        -0.24,    0.03,
   "Ängelholm",          -0.27,    0.04,
-  "Hallands Väderö",     0.10,    0.05,
   "Hästveda",            0.14,    0.03,
   "Osby",                0.12,    0.00,
   "Kristianstad",        0.15,    0.00
@@ -113,46 +111,44 @@ stations <- left_join(stations, label_nudge, by = "label") |>
          nudge_y = replace_na(nudge_y, 0.0))
 
 sta_inside  <- filter(stations, in_skane)
-sta_outside <- filter(stations, !in_skane)
+# sta_outside (Hallands Väderö) dropped from main panel — noted in caption
 
 # ── 3.  Figure 1: Study-area map  --------------------------------------------
 
 map_xlim <- c(12.38, 14.62)
 map_ylim <- c(55.14, 56.65)
 
+# Scale bar: 50 km. At ~55.9°N, 1° lon ≈ 62 km → 50 km ≈ 0.81°
+sb_x0 <- 12.44; sb_x1 <- 12.44 + 0.81
+sb_y  <- 55.185; sb_tick <- 0.018
+
 fig1 <- ggplot() +
-  # Sea background (panel fill handles this; add explicit sea polygon for label)
   # Neighbouring countries
   geom_sf(data = nbr_sf,   fill = col_nbr,   colour = "gray60", linewidth = 0.25) +
   # Swedish regions
   geom_sf(data = sweden_sf, fill = col_sweden, colour = "gray65", linewidth = 0.18) +
   # Skåne
   geom_sf(data = skane_sf,  fill = col_skane, colour = "gray25", linewidth = 0.55) +
-  # ERA5 grid cells — transparent fill, coloured border only
+  # ERA5 grid cells — faint dashed grey, background reference only
   geom_sf(data = era5_cells,
-          fill = alpha(col_era5, 0.07), colour = col_era5,
-          linewidth = 0.4) +
-  # Stations OUTSIDE Skåne — hollow diamonds
-  geom_point(data = sta_outside,
-             aes(x = lon, y = lat),
-             shape = 23, size = 3.8, fill = "white",
-             colour = "gray35", stroke = 0.9) +
+          fill = NA, colour = "grey72",
+          linewidth = 0.15, linetype = "dashed") +
   # Stations INSIDE Skåne — filled circles, coloured by mean summer Tmax
   geom_point(data = sta_inside,
              aes(x = lon, y = lat, fill = mean_tmax_jja),
-             shape = 21, size = 4.2, colour = "white", stroke = 0.8) +
+             shape = 21, size = 4.2, colour = "white", stroke = 0.8,
+             na.rm = TRUE) +
+  # Colour scale: widened to 16–24°C so 1–2°C coastal gradient reads as modest
   scale_fill_gradient(low = "#f5c842", high = "#b03a2e",
-                      name = "Mean summer\nTmax (°C)",
-                      breaks = pretty_breaks(4),
-                      guide  = guide_colourbar(barheight = 4, barwidth = 0.8)) +
-  # Station labels — inside Skåne
+                      name = "Mean Jun–Aug\nTmax (°C)",
+                      limits = c(16, 24),
+                      breaks = seq(16, 24, by = 2),
+                      na.value = "grey60",
+                      guide  = guide_colourbar(barheight = 4.5, barwidth = 0.8)) +
+  # Station labels — inside Skåne only
   geom_text(data = sta_inside,
             aes(x = lon + nudge_x, y = lat + nudge_y, label = label),
             size = 2.6, colour = "gray15") +
-  # Station labels — outside Skåne (italic to distinguish)
-  geom_text(data = sta_outside,
-            aes(x = lon + nudge_x, y = lat + nudge_y, label = label),
-            size = 2.5, colour = "gray40", fontface = "italic") +
   # Geographic labels
   annotate("text", x = 14.00, y = 55.21, label = "Baltic Sea",
            colour = "gray45", size = 2.8, fontface = "italic") +
@@ -160,23 +156,18 @@ fig1 <- ggplot() +
            colour = "gray45", size = 2.4, fontface = "italic", angle = 75) +
   annotate("text", x = 14.42, y = 56.54, label = "Skåne",
            colour = "gray20", size = 3.8, fontface = "bold") +
-  # Manual legend entry for ERA5 grid — placed in lower-right sea area
-  annotate("rect",
-           xmin = 13.10, xmax = 13.28, ymin = 55.155, ymax = 55.235,
-           fill = alpha(col_era5, 0.12), colour = col_era5, linewidth = 0.5) +
-  annotate("text", x = 13.33, y = 55.195,
-           label = "ERA5 0.25° grid cells", colour = col_era5,
-           size = 2.4, hjust = 0) +
-  # Manual legend entry for outside-Skåne station
-  annotate("point", x = 13.12, y = 55.32,
-           shape = 23, size = 3.2, fill = "white", colour = "gray35") +
-  annotate("text", x = 13.33, y = 55.32,
-           label = "Station outside Skåne", colour = "gray35",
-           size = 2.4, hjust = 0, fontface = "italic") +
+  # Scale bar
+  annotate("segment", x = sb_x0, xend = sb_x1, y = sb_y,  yend = sb_y,
+           colour = "gray20", linewidth = 0.8) +
+  annotate("segment", x = sb_x0, xend = sb_x0, y = sb_y - sb_tick, yend = sb_y + sb_tick,
+           colour = "gray20", linewidth = 0.8) +
+  annotate("segment", x = sb_x1, xend = sb_x1, y = sb_y - sb_tick, yend = sb_y + sb_tick,
+           colour = "gray20", linewidth = 0.8) +
+  annotate("text", x = (sb_x0 + sb_x1) / 2, y = sb_y - 0.028,
+           label = "50 km", colour = "gray20", size = 2.3, hjust = 0.5) +
   coord_sf(xlim = map_xlim, ylim = map_ylim, expand = FALSE) +
   labs(
-    title    = "Study area: Skåne, southern Sweden",
-    subtitle = "SMHI stations coloured by mean Jun–Aug Tmax (2010–2023)  ·  ERA5 0.25° reanalysis grid",
+    title = "SMHI station temperatures, Skåne — mean Jun–Aug Tmax (2010–2023)",
     x = NULL, y = NULL
   ) +
   theme_minimal(base_size = 11) +
@@ -184,13 +175,13 @@ fig1 <- ggplot() +
     panel.background   = element_rect(fill = col_sea, colour = NA),
     panel.grid.major   = element_line(colour = alpha("white", 0.7), linewidth = 0.3),
     panel.grid.minor   = element_blank(),
-    legend.position    = c(0.895, 0.30),
+    legend.position    = c(0.905, 0.30),
     legend.background  = element_rect(fill = alpha("white", 0.88), colour = NA),
     legend.key.size    = unit(0.5, "cm"),
     legend.title       = element_text(size = 8),
     legend.text        = element_text(size = 7.5),
-    plot.title         = element_text(face = "bold", size = 12),
-    plot.subtitle      = element_text(size = 8.5, colour = "gray40")
+    plot.title         = element_text(face = "bold", size = 11),
+    plot.subtitle      = element_blank()
   )
 
 # ── 4.  Figure 2: Heat wave and cold snap event days per year  ----------------
@@ -262,7 +253,7 @@ fig2 <- ggplot(annual, aes(x = year, y = days, fill = type)) +
 
 # ── 5.  Save  -----------------------------------------------------------------
 ggsave(file.path(OUT, "fig_01_study_area.png"),
-       fig1, width = 7.8, height = 6.2, dpi = 180)
+       fig1, width = 8.5, height = 6.4, dpi = 180)
 ggsave(file.path(OUT, "fig_02_heatwave.png"),
        fig2, width = 8.5, height = 4.5, dpi = 180)
 
