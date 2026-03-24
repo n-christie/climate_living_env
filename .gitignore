@@ -6,6 +6,10 @@
 04_netatmo/output/
 05_era5/output/
 06_integrate/output/
+07_firms/output/
+08_cams/output/
+09_deso/output/
+10_epc/output/
 
 # ── Credentials ───────────────────────────────────────────────────────────────
 .ecmwfapirc
